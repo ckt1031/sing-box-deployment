@@ -1,5 +1,5 @@
 provider "google" {
-  project = "rugged-alcove-462306-k6"
+  project = var.gcp_project_id
   credentials = file("./google-credentials.json")
 }
 
@@ -24,7 +24,7 @@ resource "google_compute_instance" "vm_instance" {
   }
 
   metadata = {
-    ssh-keys = "tsun:${file("./ssh_key.pub")}"
+    ssh-keys = "vpn:${file("./ssh_key.pub")}"
   }  
 
   tags = ["vpn"]

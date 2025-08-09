@@ -4,3 +4,4 @@ google-credentials.json
 .terraform*
 ssh_key*
 *.tfstate*
+.env
