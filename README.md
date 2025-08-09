@@ -25,4 +25,8 @@ After the server is created, you have to replace the `SERVER_IP_HERE` in the `co
 cd terraform/gcp # or terraform/azure for Azure
 terraform init
 terraform apply
+# Show the server's IP
+terraform output public_ip
+# Refresh data
+terraform refresh
 ```
