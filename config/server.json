@@ -1,0 +1,42 @@
+{
+    "log": {
+        "level": "error"
+    },
+    "inbounds": [
+        {
+            "type": "vless",
+            "tag": "vless-in",
+            "listen": "0.0.0.0",
+            "listen_port": 443,
+            "tcp_fast_open": true,
+            "tcp_multi_path": true,
+            "users": [
+                {
+                    "name": "",
+                    "uuid": "",
+                    "flow": "xtls-rprx-vision"
+                }
+            ],
+            "tls": {
+                "enabled": true,
+                "server_name": "www.microsoft.com",
+                "reality": {
+                    "enabled": true,
+                    "handshake": {
+                        "server": "www.microsoft.com",
+                        "server_port": 443
+                    },
+                    "private_key": "",
+                    "short_id": ""
+                }
+            },
+            "multiplex": {
+                "padding": true,
+                "brutal": {
+                    "up_mbps": 1000,
+                    "down_mbps": 1000
+                }
+            }
+        }
+    ]
+}
