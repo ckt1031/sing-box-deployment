@@ -35,7 +35,7 @@ resource "google_compute_instance" "vm_instance" {
 
     connection {
       type        = "ssh"
-      user        = "tsun"
+      user        = "vpn"
       private_key = file("./ssh_key")
       host        = self.network_interface[0].access_config[0].nat_ip
     }
@@ -49,7 +49,7 @@ resource "google_compute_instance" "vm_instance" {
 
     connection {
       type        = "ssh"
-      user        = "tsun"
+      user        = "vpn"
       private_key = file("./ssh_key")
       host        = self.network_interface[0].access_config[0].nat_ip
     }
