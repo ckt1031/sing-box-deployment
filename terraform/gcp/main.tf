@@ -11,7 +11,7 @@ resource "google_compute_instance" "vm_instance" {
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-12"
-      size  = 15
+      size  = 10
     }
   }
 
@@ -30,8 +30,8 @@ resource "google_compute_instance" "vm_instance" {
   tags = ["vpn"]
 
   provisioner "file" {
-    source      = "../scripts/initialize-singbox.sh"
-    destination = "/tmp/initialize-singbox.sh"
+    source      = "../scripts/initialize-server.sh"
+    destination = "/tmp/initialize-server.sh"
 
     connection {
       type        = "ssh"
@@ -55,7 +55,7 @@ resource "google_compute_instance" "vm_instance" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash /tmp/initialize-singbox.sh",
+      "sudo bash /tmp/initialize-server.sh",
       "sudo mkdir -p /etc/sing-box",
       "sudo mv /tmp/config.json /etc/sing-box/config.json",
       "sudo systemctl restart sing-box"

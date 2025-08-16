@@ -114,8 +114,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   provisioner "file" {
-    source      = "../scripts/initialize-singbox.sh"
-    destination = "/tmp/initialize-singbox.sh"
+    source      = "../scripts/initialize-server.sh"
+    destination = "/tmp/initialize-server.sh"
 
     connection {
       type        = "ssh"
@@ -139,7 +139,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash /tmp/initialize-singbox.sh",
+      "sudo bash /tmp/initialize-server.sh",
       "sudo mkdir -p /etc/sing-box",
       "sudo mv /tmp/config.json /etc/sing-box/config.json",
       "sudo systemctl restart sing-box"
