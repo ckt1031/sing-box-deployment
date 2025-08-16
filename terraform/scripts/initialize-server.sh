@@ -13,6 +13,9 @@ Signed-By: /etc/apt/keyrings/sagernet.asc
    sudo apt-get install -y sing-box &&
    sudo systemctl enable --now sing-box
 
+# Setup TCP Brutal
+bash <(curl -fsSL https://tcp.hy2.sh/)
+
 # Initialize BBR
 cat <<'EOF' > /etc/sysctl.d/99-sysctl-singbox.conf
 net.core.default_qdisc = fq
