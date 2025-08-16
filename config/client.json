@@ -26,6 +26,7 @@
           "server": "dns_direct"
         }
       ],
+      "strategy": "ipv4_only",
       "final": "dns_proxy"
     },
     "inbounds": [
