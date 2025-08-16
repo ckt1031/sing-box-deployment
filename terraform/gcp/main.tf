@@ -6,7 +6,7 @@ provider "google" {
 resource "google_compute_instance" "vm_instance" {
   name         = "sing-box"
   machine_type = "e2-micro"
-  zone         = "us-central1-a"
+  zone         = "asia-east1-a" # Taiwan
 
   boot_disk {
     initialize_params {
@@ -30,6 +30,18 @@ resource "google_compute_instance" "vm_instance" {
   tags = ["vpn"]
 
   provisioner "file" {
+    source      = "../scripts/initialize-singbox.sh"
+    destination = "/tmp/initialize-singbox.sh"
+
+    connection {
+      type        = "ssh"
+      user        = "vpn"
+      private_key = file("./ssh_key")
+      host        = self.network_interface[0].access_config[0].nat_ip
+    }
+  }
+
+  provisioner "file" {
     source      = "../../output/server.json"
     destination = "/tmp/config.json"
 
@@ -43,6 +55,8 @@ resource "google_compute_instance" "vm_instance" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo bash /tmp/initialize-singbox.sh",
+      "sudo mkdir -p /etc/sing-box",
       "sudo mv /tmp/config.json /etc/sing-box/config.json",
       "sudo systemctl restart sing-box"
     ]
@@ -54,8 +68,6 @@ resource "google_compute_instance" "vm_instance" {
       host        = self.network_interface[0].access_config[0].nat_ip
     }
   }
-
-  metadata_startup_script = file("../scripts/initialize-singbox.sh")
 }
 
 resource "google_compute_firewall" "allow_443" {

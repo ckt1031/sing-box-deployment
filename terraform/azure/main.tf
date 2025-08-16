@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "sing-box-vpn"
-  location = "southeastasia"
+  location = "eastasia" # Hong Kong
 }
 
 resource "azurerm_virtual_network" "vnet" {
