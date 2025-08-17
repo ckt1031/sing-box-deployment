@@ -12,7 +12,6 @@
             "tcp_multi_path": true,
             "users": [
                 {
-                    "name": "",
                     "uuid": "",
                     "flow": "xtls-rprx-vision"
                 }
@@ -31,10 +30,11 @@
                 }
             },
             "multiplex": {
+                "enabled": true,
                 "padding": true,
                 "brutal": {
-                    "up_mbps": 1000,
-                    "down_mbps": 1000
+                    "up_mbps": 250,
+                    "down_mbps": 250
                 }
             }
         }
