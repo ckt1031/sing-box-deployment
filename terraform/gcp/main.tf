@@ -15,6 +15,12 @@ resource "google_compute_instance" "vm_instance" {
     }
   }
 
+  shielded_instance_config {
+    enable_vtpm = true
+    enable_secure_boot = true
+    enable_integrity_monitoring = true
+  }
+
   network_interface {
     network = "default"
 
@@ -25,6 +31,7 @@ resource "google_compute_instance" "vm_instance" {
 
   metadata = {
     ssh-keys = "vpn:${file("./ssh_key.pub")}"
+    block-project-ssh-keys = "true"
   }  
 
   tags = ["vpn"]
