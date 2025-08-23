@@ -5,21 +5,15 @@
     "dns": {
         "servers": [
             {
-                "tag": "dns_proxy",
+                "tag": "dns_google",
                 "type": "tls",
-                "server": "1.1.1.1",
-                "detour": "Server"
+                "server": "8.8.8.8",
+                "detour": "vless-proxy"
             },
             {
-                "tag": "dns_direct",
-                "type": "tcp",
-                "server": "223.5.5.5"
-            },
-            {
-                "type": "fakeip",
-                "tag": "fakeip",
-                "inet4_range": "198.18.0.0/15",
-                "inet6_range": "fc00::/18"
+                "tag": "dns_dnspod",
+                "type": "udp",
+                "server": "119.29.29.29"
             }
         ],
         "rules": [
@@ -29,48 +23,44 @@
                 "rcode": "REFUSED"
             },
             {
-                "rule_set": "geosite-geolocation-!cn",
-                "server": "dns_proxy"
+                "rule_set": "geosite-geolocation-cn",
+                "server": "dns_dnspod"
             },
             {
-                "rule_set": "geosite-cn",
-                "server": "dns_direct"
-            },
-            {
-                "query_type": [
-                    "A",
-                    "AAAA"
+                "type": "logical",
+                "mode": "and",
+                "rules": [
+                    {
+                        "rule_set": "geosite-geolocation-!cn",
+                        "invert": true
+                    },
+                    {
+                        "rule_set": "geoip-cn"
+                    }
                 ],
-                "server": "fakeip"
+                "server": "dns_google",
+                "client_subnet": "114.114.114.114/24"
             }
         ],
         "strategy": "ipv4_only",
-        "final": "dns_proxy"
+        "final": "dns_google"
     },
     "inbounds": [
         {
             "type": "tun",
             "tag": "tun-in",
             "address": [
-                "172.19.0.1/30",
-                "fdfe:dcba:9876::1/126"
+                "172.19.0.1/30"
             ],
+            "strict_route": true,
             "auto_route": true,
             "sniff": true
         }
     ],
     "outbounds": [
         {
-            "type": "selector",
-            "tag": "proxy",
-            "outbounds": [
-                "Server",
-                "direct"
-            ]
-        },
-        {
             "type": "vless",
-            "tag": "Server",
+            "tag": "vless-proxy",
             "server": "",
             "server_port": 443,
             "uuid": "",
@@ -95,17 +85,27 @@
         }
     ],
     "route": {
-        "default_domain_resolver": {
-            "server": "dns_proxy",
-            "rewrite_ttl": 60
-        },
+        "default_domain_resolver": "dns_dnspod",
         "rules": [
             {
                 "action": "sniff"
             },
             {
-                "protocol": "dns",
+                "type": "logical",
+                "mode": "or",
+                "rules": [
+                    {
+                        "protocol": "dns"
+                    },
+                    {
+                        "port": 53
+                    }
+                ],
                 "action": "hijack-dns"
+            },
+            {
+                "ip_is_private": true,
+                "outbound": "direct"
             },
             {
                 "type": "logical",
@@ -117,23 +117,16 @@
                     {
                         "network": "udp",
                         "port": 443
+                    },
+                    {
+                        "protocol": "stun"
                     }
                 ],
                 "action": "reject"
             },
             {
-                "type": "logical",
-                "mode": "and",
-                "rules": [
-                    {
-                        "rule_set": "geoip-cn",
-                        "invert": true
-                    },
-                    {
-                        "rule_set": "geosite-geolocation-!cn"
-                    }
-                ],
-                "outbound": "proxy"
+                "rule_set": "geosite-geolocation-cn",
+                "outbound": "direct"
             },
             {
                 "type": "logical",
@@ -143,17 +136,10 @@
                         "rule_set": "geoip-cn"
                     },
                     {
-                        "rule_set": "geosite-cn"
+                        "rule_set": "geosite-geolocation-!cn",
+                        "invert": true
                     }
                 ],
-                "outbound": "direct"
-            },
-            {
-                "rule_set": "geoip-cn",
-                "outbound": "direct"
-            },
-            {
-                "ip_is_private": true,
                 "outbound": "direct"
             }
         ],
@@ -161,34 +147,45 @@
             {
                 "type": "remote",
                 "tag": "geosite-geolocation-!cn",
+                "format": "binary",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-geolocation-!cn.srs",
-                "download_detour": "Server"
+                "download_detour": "vless-proxy"
+            },
+            {
+                "type": "remote",
+                "tag": "geosite-geolocation-cn",
+                "format": "binary",
+                "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-geolocation-cn.srs",
+                "download_detour": "vless-proxy"
             },
             {
                 "type": "remote",
                 "tag": "geoip-cn",
+                "format": "binary",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
-                "download_detour": "Server"
+                "download_detour": "vless-proxy"
             },
             {
                 "type": "remote",
                 "tag": "geosite-cn",
+                "format": "binary",
                 "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-                "download_detour": "Server"
+                "download_detour": "vless-proxy"
             },
             {
                 "type": "remote",
                 "tag": "AWAvenue-Ads-Rule",
+                "format": "binary",
                 "url": "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Singbox.srs",
-                "download_detour": "Server"
+                "download_detour": "vless-proxy"
             }
         ],
-        "final": "proxy",
-        "auto_detect_interface": true
+        "final": "vless-proxy"
     },
     "experimental": {
         "cache_file": {
             "enabled": true,
+            "store_rdrc": true,
             "path": "cache.db"
         }
     }

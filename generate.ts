@@ -38,3 +38,11 @@ fs.writeFileSync("./output/client.json", JSON.stringify(clientConfig, null, 2));
 
 // Write server config
 fs.writeFileSync("./output/server.json", JSON.stringify(serverConfig, null, 2));
+
+// Run check script
+await $`sing-box check -c ./output/client.json`.text();
+await $`sing-box check -c ./output/server.json`.text();
+
+// Format config
+await $`sing-box format -c ./output/client.json --write`.text();
+await $`sing-box format -c ./output/server.json --write`.text();
